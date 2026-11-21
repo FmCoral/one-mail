@@ -108,9 +108,12 @@ pub fn start(app: &AppHandle) -> Result<(), String> {
                 });
             }
             "settings" => {
-                if let Err(error) = system::settings_open_window(app.clone(), Some("general".to_string())) {
-                    eprintln!("OneMail 托盘打开设置失败：{error}");
-                }
+                let app_handle = app.clone();
+                tauri::async_runtime::spawn(async move {
+                    if let Err(error) = system::settings_open_window(app_handle, Some("general".to_string())).await {
+                        eprintln!("OneMail 托盘打开设置失败：{error}");
+                    }
+                });
             }
             "quit" => app.exit(0),
             _ => {}

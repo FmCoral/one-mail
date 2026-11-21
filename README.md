@@ -125,6 +125,26 @@ pnpm tauri:build
 
 ---
 
+## 🔧 二次开发说明
+
+本仓库是 [zhihui-hu/one-mail](https://github.com/zhihui-hu/one-mail) 的二次开发版本，仓库地址：[FmCoral/one-mail](https://github.com/FmCoral/one-mail)。
+
+### 相对上游的修改
+
+- **修复 Windows 下多窗口打开卡死**：`accounts_open_add_window`、`settings_open_window`、`original_message_open_window`、`accounts_close_add_window` 由同步命令改为 `async` 命令；托盘的“设置”入口改为在异步运行时中调用。原实现中同步命令运行在主线程，而 Windows 创建 WebView 窗口同样要求主线程，会形成自锁：新窗口只画出窗口壳、内容白屏，主窗口同时失去响应。涉及 `src-tauri/src/commands/system.rs` 和 `src-tauri/src/background.rs`。
+
+### Windows 构建注意事项
+
+- 版本号使用 `make deploy` 生成的上海时区格式（如 `26.806.2208`）时，MSI 打包会失败，因为 MSI 的 minor 段上限是 255。改用 NSIS 即可：`pnpm tauri build --bundles nsis`。
+- 不要直接使用 `cargo build --release` 出的可执行文件：缺少 `custom-protocol` 特性时，应用会尝试连接 `devUrl`（Vite 开发服务器），表现为“无法访问此页面”。发布请使用 `tauri build`。
+- 如果 `beforeBuildCommand` 中的 `pnpm build` 在部分环境报 `unable to open database file`，可先手动执行 `pnpm build`，再用 `tauri build --config '{"build":{"beforeBuildCommand":""}}'` 跳过重复构建。
+
+### 验证方式
+
+打开生产构建，点击“添加账号”，窗口应正常显示添加账号表单，主窗口保持可见、可交互；设置窗口与邮件原文窗口同样可用。
+
+---
+
 ## 🎯 使用说明
 
 1. **添加邮箱账号**：点击右上角添加按钮，选择常见邮箱服务商或自定义 IMAP。

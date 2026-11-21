@@ -391,7 +391,7 @@ fn send_mac_notification(
 }
 
 #[tauri::command]
-pub fn accounts_open_add_window(app: AppHandle) -> Result<bool, String> {
+pub async fn accounts_open_add_window(app: AppHandle) -> Result<bool, String> {
     if let Some(window) = app.get_webview_window("add-account") {
         window
             .show()
@@ -416,7 +416,7 @@ pub fn accounts_open_add_window(app: AppHandle) -> Result<bool, String> {
 }
 
 #[tauri::command]
-pub fn settings_open_window(app: AppHandle, section: Option<String>) -> Result<bool, String> {
+pub async fn settings_open_window(app: AppHandle, section: Option<String>) -> Result<bool, String> {
     let section = match section.as_deref() {
         Some("about") => "about",
         _ => "general",
@@ -443,7 +443,7 @@ pub fn settings_open_window(app: AppHandle, section: Option<String>) -> Result<b
 }
 
 #[tauri::command]
-pub fn original_message_open_window(app: AppHandle, subject: Option<String>) -> Result<bool, String> {
+pub async fn original_message_open_window(app: AppHandle, subject: Option<String>) -> Result<bool, String> {
     let title = subject.as_deref().map(str::trim).filter(|value| !value.is_empty()).unwrap_or("无主题");
     if let Some(window) = app.get_webview_window("original-message") {
         window.set_title(title).and_then(|_| window.show()).and_then(|_| window.set_focus())
@@ -465,7 +465,7 @@ pub fn original_message_open_window(app: AppHandle, subject: Option<String>) -> 
 }
 
 #[tauri::command]
-pub fn accounts_close_add_window(app: AppHandle) -> Result<bool, String> {
+pub async fn accounts_close_add_window(app: AppHandle) -> Result<bool, String> {
     if let Some(window) = app.get_webview_window("add-account") {
         window
             .close()
